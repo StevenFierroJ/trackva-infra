@@ -1,0 +1,18 @@
+# Construye la imagen de trackva-web con las variables NEXT_PUBLIC_* del ambiente.
+# Next.js las fija al construir, así que `gcloud builds submit --tag` no sirve: no acepta
+# argumentos de construcción. Lo invoca scripts/build-web.sh.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --tag=${_IMAGE}
+      - --build-arg=NEXT_PUBLIC_API_URL=${_API_URL}
+      - --build-arg=NEXT_PUBLIC_SUPABASE_URL=${_SUPABASE_URL}
+      - --build-arg=NEXT_PUBLIC_SUPABASE_ANON_KEY=${_SUPABASE_ANON_KEY}
+      - --build-arg=NEXT_PUBLIC_TRACKING_URL=${_TRACKING_URL}
+      - --build-arg=NEXT_PUBLIC_WIDGETS_URL=${_WIDGETS_URL}
+      - --build-arg=NEXT_PUBLIC_GOOGLE_MAPS_KEY=${_GOOGLE_MAPS_KEY}
+      - .
+images:
+  - ${_IMAGE}
+timeout: 1200s
