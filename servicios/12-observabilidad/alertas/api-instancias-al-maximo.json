@@ -1,0 +1,31 @@
+{
+  "displayName": "TrackVa develop · la API está en su máximo de instancias",
+  "documentation": {
+    "content": "trackva-api lleva 10 minutos con 3 instancias, que es su máximo. Cloud Run ya no puede escalar más: lo siguiente son respuestas lentas o errores 429.\n\nQué hacer: confirmar en la pestaña Observabilidad que el tráfico es legítimo (y no un abuso que deba frenar Cloud Armor) y, si lo es, subir el máximo de instancias del servicio.",
+    "mimeType": "text/markdown"
+  },
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "3 instancias de trackva-api durante 10 minutos",
+      "conditionThreshold": {
+        "filter": "resource.type = \"cloud_run_revision\" AND resource.labels.service_name = \"trackva-api\" AND metric.type = \"run.googleapis.com/container/instance_count\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "300s",
+            "perSeriesAligner": "ALIGN_MAX",
+            "crossSeriesReducer": "REDUCE_SUM",
+            "groupByFields": ["resource.label.service_name"]
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 2.5,
+        "duration": "600s",
+        "trigger": { "count": 1 }
+      }
+    }
+  ],
+  "alertStrategy": { "autoClose": "1800s" },
+  "notificationChannels": ["${CHANNEL}"],
+  "enabled": true
+}

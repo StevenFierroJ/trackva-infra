@@ -131,6 +131,46 @@ inválidos). Más de cinco respuestas 5xx en cinco minutos sí indica un fallo d
 
 ![Política de errores 5xx creada](capturas/04-politica-5xx.png)
 
+### 3.5 Alertas de uso de los contenedores (por línea de comandos, 24-nov)
+
+Cloud Run ya mide el uso de CPU, de memoria y la cantidad de instancias de cada servicio; se
+ve en Cloud Run › el servicio › pestaña **Observabilidad**. Lo que se agrega aquí son los
+avisos para saber cuándo aumentar recursos:
+
+| Alerta | Condición | Qué significa | Qué aumentar |
+|---|---|---|---|
+| Memoria alta en Cloud Run | Percentil 99 de memoria por encima del 80 % durante 10 minutos, en cualquier servicio | El contenedor se acerca al límite; si lo pasa, Cloud Run lo reinicia | La memoria del servicio |
+| CPU alta en Cloud Run | Percentil 99 de CPU por encima del 80 % durante 10 minutos, en cualquier servicio | Las peticiones se encolan dentro de la instancia | La CPU, o bajar las solicitudes simultáneas por instancia |
+| La API está en su máximo de instancias | 3 instancias de `trackva-api` durante 10 minutos | Cloud Run ya no puede escalar más | El máximo de instancias |
+
+Las tres se definen en [alertas/](alertas/) y se crean con un guion, que no repite las que ya
+existen:
+
+```bash
+bash scripts/crear-alertas-uso.sh
+```
+
+```text
+creada:    TrackVa develop · la API está en su máximo de instancias
+creada:    TrackVa develop · CPU alta en Cloud Run
+creada:    TrackVa develop · memoria alta en Cloud Run
+```
+
+El guion usa la API de Monitoring directamente, porque los comandos `gcloud alpha monitoring`
+piden instalar componentes adicionales. Cada alerta lleva en su descripción qué hacer cuando
+salta, y avisa por el mismo canal de correo.
+
+Uso medido el 24-nov, en las 24 horas anteriores (incluye las ráfagas de prueba de Cloud Armor):
+
+| Servicio | Memoria, pico | CPU, pico | Instancias a la vez, pico |
+|---|---|---|---|
+| `trackva-api` (1 GiB, 1 CPU) | 34 % | 37 % | 2 de 3 |
+| `trackva-web` (512 MiB, 1 CPU) | 37 % | 23 % | 1 de 2 |
+| `trackva-integrations` (512 MiB, 1 CPU) | 19 % | 9 % | 1 de 2 |
+
+Hay margen en los tres. Como los servicios escalan a cero, solo hay datos mientras hay
+instancias encendidas: por eso las alertas miran uso sostenido y no picos sueltos.
+
 ## 4. Verificación
 
 ```bash
@@ -151,6 +191,9 @@ COMPROBACIÓN trackva-dev-web-login  | /login         | cada 900s | contenido: T
 POLÍTICA TrackVa develop · API caída               | activa | 1 canal
 POLÍTICA TrackVa develop · web caída               | activa | 1 canal
 POLÍTICA TrackVa develop · errores 5xx en la API   | activa | 1 canal
+POLÍTICA TrackVa develop · memoria alta en Cloud Run              | activa | 1 canal | > 0,8 durante 600 s
+POLÍTICA TrackVa develop · CPU alta en Cloud Run                  | activa | 1 canal | > 0,8 durante 600 s
+POLÍTICA TrackVa develop · la API está en su máximo de instancias | activa | 1 canal | > 2,5 durante 600 s
    filtro: cloud_run_revision · service_name = "trackva-api" · request_count · response_code_class = "5xx"
    agregación: ALIGN_SUM 300 s + REDUCE_SUM · condición: > 5 durante 300 s
 

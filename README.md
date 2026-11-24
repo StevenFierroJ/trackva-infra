@@ -62,7 +62,7 @@ Reglas:
 | [09](servicios/09-cloud-armor/README.md) | Cloud Armor | Límite por IP en rutas públicas y reglas contra ataques web | ADR-11 | Configurado 24-nov: límites probados; reglas de ataques web en vista previa |
 | [10](servicios/10-cloud-tasks/README.md) | Cloud Tasks | Cola `notifications` y cuenta que invoca con OIDC | ADR-04 | Configurado 24-nov: cola probada con una tarea; la API aún no la usa (falta código) |
 | [11](servicios/11-supabase-red/README.md) | Supabase | Restricción de red de PostgreSQL a la IP del NAT | ADR-12 | Configurado 24-nov: solo entran la IP del NAT y el equipo de desarrollo |
-| [12](servicios/12-observabilidad/README.md) | Observabilidad | Comprobación de disponibilidad y alertas por correo | — | Configurado 24-nov: dos comprobaciones cada 15 min y tres alertas por correo |
+| [12](servicios/12-observabilidad/README.md) | Observabilidad | Comprobación de disponibilidad y alertas por correo | — | Configurado 24-nov: dos comprobaciones cada 15 min y seis alertas por correo (disponibilidad, errores y uso de CPU, memoria e instancias) |
 | [13](servicios/13-ci-cd/README.md) | CI/CD | Workload Identity Federation y GitHub Actions | — | Configurado 24-nov: CI y despliegue automático en los tres repositorios; sin protección de rama |
 
 El orden respeta las dependencias: las cuentas, las imágenes, los secretos y la red van antes de
@@ -110,6 +110,7 @@ trackva-infra/
 ├── scripts/
 │   ├── env.sh                # nombres y región compartidos (sin secretos)
 │   ├── build-web.sh          # compila la imagen de la web con sus variables públicas
+│   ├── crear-alertas-uso.sh  # crea las alertas de uso de CPU, memoria e instancias
 │   └── cloudbuild-web.yaml   # configuración de Cloud Build que usa build-web.sh
 └── servicios/
     ├── _plantilla.md         # formato de cada documento

@@ -250,8 +250,10 @@ servicio y no se incluye aquí porque muestra una IP personal.
 
 ### 12 · Observabilidad · [detalle](servicios/12-observabilidad/README.md)
 
-Dos comprobaciones de disponibilidad desde varias regiones (la API y la web) y tres alertas por
-correo: API caída, web caída y más de 5 errores 5xx en 5 minutos.
+Dos comprobaciones de disponibilidad desde varias regiones (la API y la web) y seis alertas por
+correo. Tres de fallo: API caída, web caída y más de 5 errores 5xx en 5 minutos. Y tres de
+capacidad, para saber cuándo aumentar recursos: memoria por encima del 80 %, CPU por encima del
+80 % y la API en su máximo de instancias.
 
 ![Comprobaciones](servicios/12-observabilidad/capturas/03-comprobaciones.png)
 ![Alerta](servicios/12-observabilidad/capturas/04-politica-5xx.png)
