@@ -8,3 +8,6 @@
 credentials*.json
 secretos/
 .DS_Store
+
+# Archivo intermedio del diagrama
+diagramas/_render.html

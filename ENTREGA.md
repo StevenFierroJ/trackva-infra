@@ -34,35 +34,24 @@ detalla.
 
 ## 2. Arquitectura desplegada
 
-```
-                         Internet
-                            │ HTTPS  app-dev.trackva.com.co
-                            ▼
-              ┌──────────────────────────────┐
-              │ Balanceador global (IP fija)  │  certificado administrado por Google
-              │ + Cloud Armor                 │  límite por IP y reglas contra ataques web
-              └───────┬──────────────┬───────┘
-              /api/*  │              │  lo demás
-                      ▼              ▼
-              ┌────────────┐   ┌────────────┐
-              │ trackva-api│   │ trackva-web│      Cloud Run, us-east4, 0 a 3 instancias
-              └──┬───┬─────┘   └─────┬──────┘      ingress: solo balanceador y red interna
-                 │   │               │
-                 │   └──▶ trackva-integrations     Cloud Run, ingress interno
-                 │                                  (404 desde internet)
-                 ▼
-        VPC trackva-vpc · firewall de salida (443, 5432, 6543)
-                 │
-                 ▼
-          Cloud NAT · IP fija 136.70.79.227
-                 │
-                 ▼
-     Supabase (PostgreSQL, Auth, Storage) · Resend · Sentry
-     └─ PostgreSQL solo acepta conexiones desde la IP del NAT
+![Arquitectura de TrackVa en Google Cloud, ambiente develop](diagramas/arquitectura-develop.png)
 
-  Apoyo:  Artifact Registry (imágenes) · Secret Manager (6 secretos) · Cloud Tasks (cola)
-          Cloud Monitoring (comprobaciones y alertas) · GitHub Actions sin llaves (despliegue)
-```
+Cómo leerla, de arriba abajo:
+
+1. **Clientes.** Todo entra por HTTPS a un solo dominio, `app-dev.trackva.com.co`.
+2. **Borde.** El balanceador global pone el certificado y reparte por ruta; Cloud Armor filtra
+   antes de que la petición llegue a un contenedor.
+3. **Cloud Run.** `/api/*` va a la API y el resto a la web. Integraciones no recibe tráfico de
+   fuera: solo la API la llama, por la red interna.
+4. **VPC.** Los tres servicios sacan todo su tráfico por la VPC. El firewall limita los puertos
+   y el NAT les da una única IP de salida.
+5. **Servicios externos.** PostgreSQL en Supabase solo acepta conexiones desde esa IP.
+
+A la derecha, la entrega continua: cada cambio en `main` pasa por las comprobaciones y se
+despliega solo, sin llaves guardadas en GitHub.
+
+La imagen se genera con [diagramas/generar.py](diagramas/generar.py); también está en
+[vectorial](diagramas/arquitectura-develop.svg).
 
 ---
 

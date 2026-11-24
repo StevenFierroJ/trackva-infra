@@ -14,19 +14,10 @@ consola web y se documenta en su propia carpeta.
 
 ## Qué se despliega
 
-```
-Internet ──HTTPS──▶ Balanceador global + Cloud Armor
-                        │  /api/*            │  resto
-                        ▼                    ▼
-                  trackva-api          trackva-web          (Cloud Run, us-east4)
-                        │
-                        ▼
-              trackva-integrations                          (Cloud Run, ingress interno)
-                        │
-        VPC trackva-vpc ─▶ Cloud NAT (IP estática) ─▶ Supabase, Resend, Sentry, PostHog
-```
+![Arquitectura de TrackVa en Google Cloud, ambiente develop](diagramas/arquitectura-develop.png)
 
-Datos, autenticación y archivos siguen en Supabase (ADR-03); no se despliegan aquí.
+Datos, autenticación y archivos siguen en Supabase (ADR-03); no se despliegan aquí. La imagen
+sale de [diagramas/generar.py](diagramas/generar.py).
 
 ## Cómo se trabaja cada servicio
 
@@ -114,6 +105,7 @@ restricción de Supabase necesita la IP del NAT ya en uso.
 trackva-infra/
 ├── README.md                 # este archivo: plan, reglas y estado
 ├── ENTREGA.md                # documento final de entrega
+├── diagramas/                # diagrama de arquitectura (PNG, SVG y su generador)
 ├── referencia/               # documento de diseño
 ├── scripts/
 │   ├── env.sh                # nombres y región compartidos (sin secretos)
