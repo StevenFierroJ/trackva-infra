@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Estado** | En curso desde el 27-nov-2026: regla de Cloud Armor y dos secretos hechos; faltan el app secret, conectar los secretos al servicio y suscribir el webhook en Meta |
+| **Estado** | En curso desde el 27-nov-2026: regla de Cloud Armor, los tres secretos y su conexión al servicio hechos; falta suscribir el webhook en Meta (después de desplegar el código) |
 | **Proyecto** | `trackva-dev` |
 | **Región** | `us-east4` |
 | **ADR del diseño** | — (R-36, propuesta v1.1 en `trackva-docs`) |
@@ -64,7 +64,7 @@ done
 read -s S && printf '%s' "$S" | gcloud secrets versions add api-whatsapp-app-secret --data-file=- ; unset S
 ```
 
-### 3.3 Conectar los secretos al servicio (pendiente)
+### 3.3 Conectar los secretos al servicio (27-nov)
 
 Los tres van juntos y **antes** de desplegar el código que trae `WHATSAPP_APP_ID` en `deploy/develop.env`. Con unas variables sí y otras no, la API no arranca.
 
@@ -72,6 +72,12 @@ Los tres van juntos y **antes** de desplegar el código que trae `WHATSAPP_APP_I
 gcloud run services update trackva-api --region=$REGION \
   --update-secrets="WHATSAPP_APP_SECRET=api-whatsapp-app-secret:latest,WHATSAPP_WEBHOOK_VERIFY_TOKEN=api-whatsapp-webhook-verify-token:latest,WHATSAPP_TOKEN_ENCRYPTION_KEY=api-whatsapp-token-encryption-key:latest"
 ```
+
+```
+Service [trackva-api] revision [trackva-api-00012-4pj] has been deployed and is serving 100 percent of traffic.
+```
+
+La revisión sigue con la imagen anterior, que todavía no lee las variables `WHATSAPP_*`; `/api/v1/health` respondió 200. El código que las usa llega al pasar `develop` a `main`.
 
 ### 3.4 Suscribir el webhook en Meta (pendiente, después del despliegue)
 
