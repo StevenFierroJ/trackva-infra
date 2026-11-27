@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Estado** | Configurado el 27-nov-2026 por línea de comandos. El trabajo `trackva-hourly-tick` queda **pausado** hasta que la API con R-45 llegue a develop |
+| **Estado** | Configurado y **activo** desde el 27-nov-2026 (tic reanudado tras desplegar `trackva-api` #129); probado de punta a punta el mismo día |
 | **Proyecto** | `trackva-dev` |
 | **Región** | `us-east4` |
 | **ADR del diseño** | ADR-04, ADR-13 |
@@ -136,6 +136,34 @@ POST https://app-dev.trackva.com.co/api/v1/internal/tasks → 404 de Cloud Armor
 no la respuesta JSON de la API)
 ```
 
+### 4.1 Prueba de punta a punta (27-nov, revisión `trackva-api-00011-b7p`)
+
+Registros de Cloud Run y de la API después de reanudar el tic y forzar uno:
+
+```text
+23:16:29  200  Google-Cloud-Scheduler  /api/v1/internal/schedule/tick
+23:16:29  API  schedule tick  tenants=5 enqueued=1 duplicates=0
+23:16:29  200  Google-Cloud-Tasks      /api/v1/internal/tasks
+23:16:29  API  internal task done  notifications.sweep (cola notifications)
+```
+
+- **Cloud Scheduler entra con el ingress cerrado** (lo que quedaba por comprobar): 200.
+- **Cola `jobs`:** una tarea `wms.reconcile` de «QA Bodega» creada con `gcloud tasks create-http-task`
+  → 200, `wms-reconcile: sin diferencias`, `internal task done wms.reconcile`; la cola quedó vacía.
+- **Correo por la cola:** un mensaje de prueba en el outbox de «QA Courier» con destinatario
+  `delivered@resend.dev` (dirección de prueba de Resend) y fecha de hace 15 minutos; el barrido lo
+  reencoló, la API creó `notification.send`, Cloud Tasks la entregó y el mensaje quedó `sent` con id
+  de Resend:
+
+```text
+23:19:24  API  notifications sweep re-enqueued  count=1
+23:19:24  API  internal task done  notifications.sweep
+23:19:24  API  notification email sent
+23:19:24  API  internal task done  notification.send
+```
+
+- Sin respuestas 5xx ni errores en la revisión desde el despliegue.
+
 ## 5. Índice de capturas
 
 Este servicio se configuró por línea de comandos: la evidencia son los comandos y sus salidas
@@ -154,11 +182,7 @@ seguirá intentando encolar en `jobs`.
 
 ## 7. Diferencias con el diseño y pendientes
 
-- **Pausado hasta el despliegue.** La API desplegada todavía no tiene `/api/v1/internal/*`.
-  Cuando `trackva-api` con R-45 pase a `main` y se despliegue: reanudar con
-  `gcloud scheduler jobs resume "$SCHEDULER_TICK" --location="$REGION"` y forzar un tic con
-  `gcloud scheduler jobs run "$SCHEDULER_TICK" --location="$REGION"`.
-- **Por comprobar al reanudar:** que Cloud Scheduler entra a la API con el ingress cerrado
-  (Cloud Tasks sí, servicio 10). Si no entra, el registro de Cloud Run lo muestra como 403 o
-  404 en `/schedule/tick`; la alternativa es que el tic lo encole Cloud Tasks.
+- **Se creó pausado** y se reanudó el 27-nov después de desplegar `trackva-api` #129 (sección 4.1).
+  Para forzar un tic: `gcloud scheduler jobs run "$SCHEDULER_TICK" --location="$REGION"`.
+- **Cloud Scheduler entra con el ingress cerrado**, igual que Cloud Tasks (comprobado el 27-nov).
 - El diseño original no tenía planificador: los trabajos diarios llegaron con el WMS.

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Estado** | Configurado el 24-nov-2026 (infraestructura). La API aún no encola: falta el código |
+| **Estado** | Configurado el 24-nov-2026. La API encola desde el 27-nov (R-45, servicio 14) |
 | **Proyecto** | `trackva-dev` |
 | **Región** | `us-east4` |
 | **ADR del diseño** | ADR-04, ADR-13 |
