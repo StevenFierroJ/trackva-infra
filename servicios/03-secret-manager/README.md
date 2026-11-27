@@ -37,6 +37,9 @@ En Seguridad › Secret Manager › **Crear secreto**, uno por fila:
 | 4 | `api-resend-api-key` | `RESEND_API_KEY` | `.env` de `trackva-api` |
 | 5 | `api-google-maps-server-key` | `GOOGLE_MAPS_SERVER_KEY` | `.env` de `trackva-api` |
 | 6 | `api-sentry-dsn` | `SENTRY_DSN` | `.env` de `trackva-api`. Si no hay DSN de develop, no crear este secreto |
+| 7 | `api-whatsapp-app-secret` | `WHATSAPP_APP_SECRET` | Meta for Developers › app TrackVa › Configuración de la app › Básica › **Clave secreta de la app** (servicio 15) |
+| 8 | `api-whatsapp-webhook-verify-token` | `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | **Nuevo:** `openssl rand -hex 32`. Se pega también en Meta al suscribir el webhook |
+| 9 | `api-whatsapp-token-encryption-key` | `WHATSAPP_TOKEN_ENCRYPTION_KEY` | **Nuevo:** `openssl rand -base64 32` (32 bytes). Cifra en la base el token de cada courier: perderla obliga a reconectar todos los números |
 
 En cada uno:
 
