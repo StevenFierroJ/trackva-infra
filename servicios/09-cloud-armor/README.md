@@ -47,6 +47,7 @@ Todas en «Modo avanzado» (expresión), salvo la 900.
 
 | Prioridad | Qué hace | Condición | Acción |
 |---|---|---|---|
+| `800` | Las rutas internas de la API no se exponen (agregada el 27-nov, servicio 14) | `request.path.startsWith('/api/v1/internal/')` | Denegar `404` |
 | `900` | Deja pasar las llamadas de los propios servicios | Modo básico · rango de IP `136.70.79.227/32` | Permitir |
 | `1000` | Límite por IP en las rutas públicas de la API | `request.path.matches('/api/v1/public/.*')` | Limitar: `120` peticiones por `60` s, por IP; al exceder, denegar con `429` |
 | `1100` | Límite por IP en el rastreo y los widgets de la web | `request.path.matches('/track.*') \|\| request.path.matches('/w/.*')` | Limitar: `120` por `60` s, por IP; al exceder, `429` |
@@ -55,6 +56,8 @@ Todas en «Modo avanzado» (expresión), salvo la 900.
 
 Por qué cada una:
 
+- **800.** Las rutas internas solo las llaman Cloud Tasks y Cloud Scheduler por la URL `run.app`,
+  que no pasa por el balanceador (servicio 14). Va antes de la 900 para que tampoco entren por la IP del NAT.
 - **900.** Cuando la web arma una página en el servidor (por ejemplo `/track/CODIGO`), consulta
   la API pasando por el balanceador, y todas esas consultas salen de una sola IP: la del NAT.
   Sin esta regla, el límite de la 1000 se aplicaría a la web entera como si fuera un solo

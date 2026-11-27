@@ -171,6 +171,12 @@ Uso medido el 24-nov, en las 24 horas anteriores (incluye las ráfagas de prueba
 Hay margen en los tres. Como los servicios escalan a cero, solo hay datos mientras hay
 instancias encendidas: por eso las alertas miran uso sostenido y no picos sueltos.
 
+### 3.6 Alertas de las tareas internas (por línea de comandos, 27-nov)
+
+Con R-45 se suman dos alertas por registro, en el mismo directorio y con el mismo script:
+**tareas internas con error** (una respuesta 5xx en `/api/v1/internal/`) y **conciliación del
+WMS con diferencias**. Detalle en el servicio 14. Quedan ocho alertas por correo.
+
 ## 4. Verificación
 
 ```bash

@@ -52,7 +52,7 @@ Las cuentas nacen **sin ningún rol**. Los permisos se agregan donde se usan:
 | `trackva-api-cloud-run` | Encolar tareas (`cloudtasks.enqueuer`) | 10 |
 | `trackva-web-cloud` | Leer sus secretos | 03 |
 | `trackva-integraciones-cloud-ru` | Leer sus secretos | 03 |
-| `trackva-tasks-invoker` (por crear) | Cuenta con la que Cloud Tasks llama a la API con OIDC | 10 |
+| `trackva-tasks-invoker` | Cuenta con la que Cloud Tasks llama a la API con OIDC | 10 |
 | `trackva-github-deploy` (por crear) | Desplegar desde GitHub Actions sin llaves | 13 |
 
 No se crean llaves de cuenta de servicio en ningún caso.

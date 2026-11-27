@@ -34,6 +34,8 @@ export SA_INTEGRATIONS="trackva-integraciones-cloud-ru"   # la consola recortó 
 export SA_TASKS="trackva-tasks-invoker"
 export SA_DEPLOY="trackva-github-deploy"
 export TASKS_QUEUE="notifications"
+export JOBS_QUEUE="jobs"                  # R-45: trabajos diarios por empresa (servicio 14)
+export SCHEDULER_TICK="trackva-hourly-tick"  # R-45: tic de cada hora de Cloud Scheduler (servicio 14)
 export ARMOR_POLICY="trackva-armor"
 export LB_NAME="trackva-lb"
 

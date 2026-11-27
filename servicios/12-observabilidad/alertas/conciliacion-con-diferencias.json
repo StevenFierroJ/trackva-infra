@@ -1,0 +1,19 @@
+{
+  "displayName": "TrackVa develop · conciliación del WMS con diferencias",
+  "documentation": {
+    "content": "La conciliación diaria del WMS (03:00 de cada empresa) encontró diferencias entre el libro de movimientos y los saldos, o entre las asignaciones abiertas y lo reservado. Nunca corrige sola.\n\nQué hacer: leer en Logging la entrada `wms-reconcile: diferencias entre libro y saldos` (trae la empresa y las primeras 50 diferencias) y repetir con `npm run wms:reconcile -- <tenantId>` desde el equipo de desarrollo.",
+    "mimeType": "text/markdown"
+  },
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "Diferencias en la conciliación",
+      "conditionMatchedLog": {
+        "filter": "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"trackva-api\" AND jsonPayload.msg=\"wms-reconcile: diferencias entre libro y saldos\""
+      }
+    }
+  ],
+  "alertStrategy": { "notificationRateLimit": { "period": "3600s" }, "autoClose": "86400s" },
+  "notificationChannels": ["${CHANNEL}"],
+  "enabled": true
+}

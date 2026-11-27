@@ -60,10 +60,11 @@ Reglas:
 | [07](servicios/07-cloud-run-web/README.md) | Cloud Run · web | `trackva-web` (Next.js, SSR) | ADR-02 | Configurado 24-nov: sirve sus páginas en `run.app`; el inicio de sesión espera el dominio |
 | [08](servicios/08-balanceador/README.md) | Balanceador | IP global, NEG sin servidor, mapa de URL, certificado administrado y DNS | ADR-10 | Configurado 24-nov: dominio con HTTPS, inicio de sesión y Cloud Run cerrado a internet |
 | [09](servicios/09-cloud-armor/README.md) | Cloud Armor | Límite por IP en rutas públicas y reglas contra ataques web | ADR-11 | Configurado 24-nov: límites probados; reglas de ataques web en vista previa |
-| [10](servicios/10-cloud-tasks/README.md) | Cloud Tasks | Cola `notifications` y cuenta que invoca con OIDC | ADR-04 | Configurado 24-nov: cola probada con una tarea; la API aún no la usa (falta código) |
+| [10](servicios/10-cloud-tasks/README.md) | Cloud Tasks | Cola `notifications` y cuenta que invoca con OIDC | ADR-04 | Configurado 24-nov: cola probada con una tarea; la API la usa desde R-45 (en código, por desplegar) |
 | [11](servicios/11-supabase-red/README.md) | Supabase | Restricción de red de PostgreSQL a la IP del NAT | ADR-12 | Configurado 24-nov: solo entran la IP del NAT y el equipo de desarrollo |
 | [12](servicios/12-observabilidad/README.md) | Observabilidad | Comprobación de disponibilidad y alertas por correo | — | Configurado 24-nov: dos comprobaciones cada 15 min y seis alertas por correo (disponibilidad, errores y uso de CPU, memoria e instancias) |
 | [13](servicios/13-ci-cd/README.md) | CI/CD | Workload Identity Federation y GitHub Actions | — | Configurado 24-nov: CI y despliegue automático en los tres repositorios; sin protección de rama |
+| [14](servicios/14-cloud-scheduler/README.md) | Cloud Scheduler | Tic de cada hora, cola `jobs` y regla de Cloud Armor para las rutas internas | ADR-04, ADR-13 | Configurado 27-nov: tic pausado hasta desplegar R-45 |
 
 El orden respeta las dependencias: las cuentas, las imágenes, los secretos y la red van antes de
 Cloud Run; el balanceador necesita los servicios; Cloud Armor necesita el balanceador; la

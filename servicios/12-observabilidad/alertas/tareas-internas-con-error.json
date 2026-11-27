@@ -1,0 +1,19 @@
+{
+  "displayName": "TrackVa develop · tareas internas con error",
+  "documentation": {
+    "content": "Una tarea de Cloud Tasks o el tic de Cloud Scheduler respondió 5xx en `/api/v1/internal/`. Cloud Tasks la reintenta (3 intentos en `notifications`, 5 en `jobs`); si se agotan, la tarea se pierde y el trabajo de ese día no corrió.\n\nQué hacer: buscar en Logging el `requestId` de la petición fallida y el mensaje de error de la API. Un trabajo diario se puede volver a correr a mano con `npm run wms:storage-charges -- --tenant <id>` o `npm run wms:alerts-digest -- --tenant <id>` (los dos son idempotentes por día).",
+    "mimeType": "text/markdown"
+  },
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "5xx en una ruta interna de trackva-api",
+      "conditionMatchedLog": {
+        "filter": "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"trackva-api\" AND httpRequest.requestUrl:\"/api/v1/internal/\" AND httpRequest.status>=500"
+      }
+    }
+  ],
+  "alertStrategy": { "notificationRateLimit": { "period": "3600s" }, "autoClose": "86400s" },
+  "notificationChannels": ["${CHANNEL}"],
+  "enabled": true
+}
