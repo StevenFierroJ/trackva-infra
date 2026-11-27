@@ -131,8 +131,8 @@ Basta una regla explícita (`/api/*`); lo demás cae en el backend predeterminad
 intento había una tercera fila `/*` y la pantalla de revisión mostraba los dos backends
 cruzados; se quitó antes de crear.
 
-La API ya sirve todas sus rutas bajo `/api/v1` y su documentación en `/api/docs`, así que el
-balanceador no reescribe nada. La web no tiene rutas propias bajo `/api`.
+La API ya sirve todas sus rutas bajo `/api/v1`, así que el balanceador no reescribe nada.
+(Su documentación en `/api/docs` está apagada con `NODE_ENV=production` desde el 27-nov-2026.) La web no tiene rutas propias bajo `/api`.
 
 Revisar y **Crear**. El certificado tarda de 15 a 60 minutos en pasar a «Activo»; mientras
 tanto el navegador muestra un error de certificado.
@@ -421,7 +421,8 @@ Antes de borrarlo hay que devolver el ingress de Cloud Run a «Todo», o los ser
   no en esta topología. Hay que revisarlo en los dos repositorios antes de tener tráfico real.
   Mientras tanto, el límite por IP que cuenta bien es el de Cloud Armor (servicio 09), que es
   justo lo que prevé el ADR-11.
-- **Documentación de la API pública.** `/api/docs` (Swagger) responde 200 sin sesión, también
-  con `NODE_ENV=production`. Aceptable en develop; antes de producción hay que apagarla o
-  protegerla en `trackva-api`.
+- **Documentación de la API pública (resuelto el 27-nov-2026).** `/api/docs` (Swagger)
+  respondía 200 sin sesión, también con `NODE_ENV=production`. Desde `trackva-api` #126 solo se
+  monta fuera de producción o con `API_DOCS_ENABLED=true`; develop no define la variable y
+  `/api/docs` responde 404.
 - La salida de la web ya va completa por la VPC (revisión `trackva-web-00003-4r9`).
