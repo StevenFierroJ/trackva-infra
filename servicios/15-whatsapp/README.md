@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Estado** | En curso desde el 27-nov-2026: regla de Cloud Armor, los tres secretos y su conexión al servicio hechos; falta suscribir el webhook en Meta (después de desplegar el código) |
+| **Estado** | Configurado el 27-nov-2026: regla de Cloud Armor, tres secretos conectados al servicio y webhook suscrito y probado desde Meta |
 | **Proyecto** | `trackva-dev` |
 | **Región** | `us-east4` |
 | **ADR del diseño** | — (R-36, propuesta v1.1 en `trackva-docs`) |
@@ -79,7 +79,7 @@ Service [trackva-api] revision [trackva-api-00012-4pj] has been deployed and is 
 
 La revisión sigue con la imagen anterior, que todavía no lee las variables `WHATSAPP_*`; `/api/v1/health` respondió 200. El código que las usa llega al pasar `develop` a `main`.
 
-### 3.4 Suscribir el webhook en Meta (pendiente, después del despliegue)
+### 3.4 Suscribir el webhook en Meta (27-nov, tras desplegar `trackva-api` #131)
 
 En Meta for Developers › TrackVa › Casos de uso › Conectar en WhatsApp › Configuración:
 
@@ -87,7 +87,9 @@ En Meta for Developers › TrackVa › Casos de uso › Conectar en WhatsApp ›
 |---|---|
 | URL de devolución de llamada | `https://app-dev.trackva.com.co/api/v1/public/whatsapp/webhook` |
 | Token de verificación | el valor de `api-whatsapp-webhook-verify-token` (`gcloud secrets versions access latest --secret=api-whatsapp-webhook-verify-token`) |
-| Campo de webhook | `messages` |
+| Campo de webhook | `messages` (Meta deja suscritos además varios campos por defecto; la API solo procesa `messages` y a los demás responde 200) |
+
+El token lo pegó Steven. Meta marcó «Configurar webhooks» como completado.
 
 ## 4. Verificación
 
@@ -96,6 +98,10 @@ En Meta for Developers › TrackVa › Casos de uso › Conectar en WhatsApp ›
 curl -s -o /dev/null -w "%{http_code}\n" -X POST https://$DEV_DOMAIN/api/v1/public/whatsapp/webhook \
   -H 'Content-Type: application/json' -d '{}'
 ```
+
+Prueba desde Meta (campo `messages` › **Probar** › Enviar al servidor v27.0), 27-nov 19:11: Meta respondió «Se probó correctamente». En la base de dev quedó el evento en `whatsapp_webhook_events` con `tenant_id` vacío, porque la muestra de Meta trae el número de ejemplo `123456123`, que no es de ninguna empresa. Eso confirma la firma real de Meta contra el secreto cargado.
+
+Mientras la app de Meta esté sin publicar, solo llegan estos webhooks de prueba del panel: los mensajes reales (incluso de los administradores) no se entregan hasta publicarla.
 
 ## 5. Notas
 
